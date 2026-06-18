@@ -17,6 +17,7 @@ import {
   Clock,
   Fingerprint,
   Clock3,
+  CaseSensitive,
   type LucideProps,
 } from 'lucide-react';
 
@@ -39,6 +40,7 @@ const TOOL_ICONS: Record<string, Icon> = {
   'json-diff': FileJson,
   'unix-time': Clock,
   'uuid-generator': Fingerprint,
+  'case-convert': CaseSensitive,
 };
 
 const CATEGORY_ICONS: Record<ToolCategory, Icon> = {

@@ -2,18 +2,25 @@ import { motion } from 'framer-motion';
 import type { Tool, ToolCategory } from '@bytesmith/core';
 import { Logo } from './Logo';
 import { CATEGORY_LABELS, toolIcon } from '../lib/icons';
-import { Search } from 'lucide-react';
+import { Search, X } from 'lucide-react';
 
 interface Props {
   groups: { category: ToolCategory; tools: Tool[] }[];
   activeId: string;
   onSelect: (id: string) => void;
   onOpenPalette: () => void;
+  open?: boolean;
+  onClose?: () => void;
 }
 
-export function ToolRail({ groups, activeId, onSelect, onOpenPalette }: Props) {
+export function ToolRail({ groups, activeId, onSelect, onOpenPalette, open = false, onClose }: Props) {
   return (
-    <aside className="rail">
+    <aside className={`rail${open ? ' open' : ''}`}>
+      {onClose && (
+        <button className="rail__close" onClick={onClose} aria-label="Close menu">
+          <X size={18} />
+        </button>
+      )}
       {/* Home: a real link to the base URL so it reloads to a fresh default state. */}
       <a className="rail__brand" href={import.meta.env.BASE_URL} title="Bytesmith — reload">
         <Logo />

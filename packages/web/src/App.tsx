@@ -6,7 +6,9 @@ import { DiffWorkspace } from './components/DiffWorkspace';
 import { GeneratorWorkspace } from './components/GeneratorWorkspace';
 import { CommandPalette } from './components/CommandPalette';
 import { ToastProvider } from './components/toast';
+import { Logo } from './components/Logo';
 import { useDebounced } from './hooks/useDebounced';
+import { Menu, Search } from 'lucide-react';
 
 /** Per-tool buffers: `a` is the single/left input, `b` is the right input (diff tools). */
 interface ToolState {
@@ -43,6 +45,16 @@ export default function App() {
   const [stateById, setStateById] = useState<Record<string, ToolState>>({});
   const [optionsById, setOptionsById] = useState<Record<string, ToolOptions>>({});
   const [paletteOpen, setPaletteOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Selecting a tool also closes the mobile drawer.
+  const handleSelect = useCallback(
+    (id: string) => {
+      selectId(id);
+      setMenuOpen(false);
+    },
+    [selectId],
+  );
 
   const st = stateById[tool.id] ?? EMPTY;
   const setA = useCallback(
@@ -92,8 +104,31 @@ export default function App() {
 
   return (
     <ToastProvider>
+      {/* Mobile-only top bar: brings back the hidden sidebar via a drawer + search. */}
+      <header className="topbar">
+        <a className="topbar__brand" href={import.meta.env.BASE_URL} title="Bytesmith — reload">
+          <Logo size={24} />
+          <span>Byte<b>smith</b></span>
+        </a>
+        <span className="topbar__tool">{tool.name}</span>
+        <button className="icon-btn" onClick={() => setPaletteOpen(true)} aria-label="Search tools">
+          <Search size={18} />
+        </button>
+        <button className="icon-btn" onClick={() => setMenuOpen(true)} aria-label="Open menu">
+          <Menu size={18} />
+        </button>
+      </header>
+
       <div className="app">
-        <ToolRail groups={GROUPS} activeId={tool.id} onSelect={selectId} onOpenPalette={() => setPaletteOpen(true)} />
+        <ToolRail
+          groups={GROUPS}
+          activeId={tool.id}
+          onSelect={handleSelect}
+          onOpenPalette={() => setPaletteOpen(true)}
+          open={menuOpen}
+          onClose={() => setMenuOpen(false)}
+        />
+        {menuOpen && <div className="rail-scrim" onClick={() => setMenuOpen(false)} />}
         {isDiffTool(tool) ? (
           <DiffWorkspace tool={tool} left={st.a} right={st.b} onLeft={setA} onRight={setB} result={diffResult!} />
         ) : isGeneratorTool(tool) ? (
@@ -102,7 +137,7 @@ export default function App() {
           <Workspace tool={tool} input={st.a} onInput={setA} options={options} onOption={setOption} result={transformResult!} />
         )}
       </div>
-      <CommandPalette open={paletteOpen} tools={ALL_TOOLS} onSelect={selectId} onClose={() => setPaletteOpen(false)} />
+      <CommandPalette open={paletteOpen} tools={ALL_TOOLS} onSelect={handleSelect} onClose={() => setPaletteOpen(false)} />
     </ToastProvider>
   );
 }

@@ -12,6 +12,7 @@ import {
   jsonDiff,
   unixTime,
   uuidGenerator,
+  caseConvert,
 } from '../tools/index';
 import {
   jsonParseString,
@@ -156,6 +157,23 @@ describe('unix-time', () => {
 
   it('errors on garbage', () => {
     expect(unixTime.run('not a date', {}).error).toBeTruthy();
+  });
+});
+
+describe('case-convert', () => {
+  const c = (input: string, target: string) => caseConvert.run(input, { target }).output;
+  it('converts to the common cases', () => {
+    expect(c('Bytesmith Dev Tools', 'camel')).toBe('bytesmithDevTools');
+    expect(c('Bytesmith Dev Tools', 'pascal')).toBe('BytesmithDevTools');
+    expect(c('Bytesmith Dev Tools', 'snake')).toBe('bytesmith_dev_tools');
+    expect(c('Bytesmith Dev Tools', 'kebab')).toBe('bytesmith-dev-tools');
+    expect(c('Bytesmith Dev Tools', 'constant')).toBe('BYTESMITH_DEV_TOOLS');
+  });
+  it('splits camelCase input back into words', () => {
+    expect(c('parseJSONString', 'kebab')).toBe('parse-json-string');
+  });
+  it('processes each line independently', () => {
+    expect(c('one two\nthree four', 'snake')).toBe('one_two\nthree_four');
   });
 });
 

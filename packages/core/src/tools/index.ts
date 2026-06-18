@@ -11,6 +11,7 @@ import { textDiff } from './textDiff';
 import { jsonDiff } from './jsonDiff';
 import { unixTime } from './unixTime';
 import { uuidGenerator } from './uuid';
+import { caseConvert } from './caseConvert';
 
 /**
  * The single source of truth for the tool catalog. Order here is the display order in the
@@ -26,6 +27,8 @@ export const registry = new ToolRegistry()
   .register(jsonSortKeys)
   .register(jsonEscape)
   .register(jsonSize)
+  // String
+  .register(caseConvert)
   // Encode
   .register(base64Encode)
   .register(base64Decode)
@@ -55,4 +58,5 @@ export {
   jsonDiff,
   unixTime,
   uuidGenerator,
+  caseConvert,
 };
