@@ -18,6 +18,7 @@ import {
   Fingerprint,
   Clock3,
   CaseSensitive,
+  Globe,
   type LucideProps,
 } from 'lucide-react';
 
@@ -39,6 +40,7 @@ const TOOL_ICONS: Record<string, Icon> = {
   'text-diff': GitCompareArrows,
   'json-diff': FileJson,
   'unix-time': Clock,
+  'timezone': Globe,
   'uuid-generator': Fingerprint,
   'case-convert': CaseSensitive,
 };

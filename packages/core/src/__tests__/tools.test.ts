@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { defaultOptions } from '../types';
 import { friendlyJsonError } from '../util/json';
 import { lineDiff, countChanges } from '../util/diff';
+import { epochInfo, getOffsetMinutes, offsetLabel, diffLabel, sunAltitudeSin, subsolarPoint, zoneApproxLatLng } from '../util/time';
 import { registry } from '../tools/index';
 import {
   base64Encode,
@@ -10,7 +11,6 @@ import {
   urlDecode,
   textDiff,
   jsonDiff,
-  unixTime,
   uuidGenerator,
   caseConvert,
 } from '../tools/index';
@@ -136,27 +136,63 @@ describe('text-diff tool', () => {
   });
 });
 
-describe('unix-time', () => {
+describe('epochInfo', () => {
+  const NOW = 1700000000000;
+  const field = (info: ReturnType<typeof epochInfo>, label: string) =>
+    info.fields.find((f) => f.label === label)?.value;
+
   it('converts epoch seconds to ISO/UTC', () => {
-    const res = unixTime.run('1700000000', {});
-    expect(res.output).toContain('2023-11-14T22:13:20.000Z');
-    expect(res.output).toMatch(/Unix \(s\)\s*: 1700000000/);
-    expect(res.output).toContain('detected: seconds');
+    const info = epochInfo('1700000000', NOW);
+    expect(field(info, 'ISO 8601')).toBe('2023-11-14T22:13:20.000Z');
+    expect(field(info, 'Unix (s)')).toBe('1700000000');
+    expect(info.detected).toBe('seconds');
   });
 
   it('treats large numbers as milliseconds', () => {
-    const res = unixTime.run('1700000000000', {});
-    expect(res.output).toContain('2023-11-14T22:13:20.000Z');
-    expect(res.output).toContain('detected: milliseconds');
+    const info = epochInfo('1700000000000', NOW);
+    expect(field(info, 'ISO 8601')).toBe('2023-11-14T22:13:20.000Z');
+    expect(info.detected).toBe('milliseconds');
   });
 
   it('parses a date string back to epoch', () => {
-    const res = unixTime.run('2023-11-14T22:13:20Z', {});
-    expect(res.output).toMatch(/Unix \(s\)\s*: 1700000000/);
+    const info = epochInfo('2023-11-14T22:13:20Z', NOW);
+    expect(field(info, 'Unix (s)')).toBe('1700000000');
   });
 
   it('errors on garbage', () => {
-    expect(unixTime.run('not a date', {}).error).toBeTruthy();
+    expect(epochInfo('not a date', NOW).error).toBeTruthy();
+  });
+});
+
+describe('timezone helpers', () => {
+  it('reports a fixed offset for non-DST zones', () => {
+    // IST is always +05:30 (no DST)
+    expect(getOffsetMinutes('Asia/Kolkata', new Date('2023-06-01T00:00:00Z'))).toBe(330);
+    expect(getOffsetMinutes('UTC', new Date())).toBe(0);
+  });
+
+  it('formats offset labels', () => {
+    expect(offsetLabel(330)).toBe('UTC+05:30');
+    expect(offsetLabel(-300)).toBe('UTC-05:00');
+  });
+
+  it('describes the gap between zones', () => {
+    expect(diffLabel(330, 540)).toBe('3h 30m ahead of');
+    expect(diffLabel(540, 330)).toBe('3h 30m behind');
+    expect(diffLabel(0, 0)).toBe('the same time as');
+  });
+
+  it('computes day/night from the subsolar point', () => {
+    // Noon UTC: the sun is over ~0° longitude, so London is day, Tokyo (≈140°E) is night.
+    const sub = subsolarPoint(new Date('2023-06-21T12:00:00Z'));
+    expect(sunAltitudeSin(51.5, 0, sub)).toBeGreaterThan(0);
+    expect(sunAltitudeSin(35.7, 139.7, sub)).toBeLessThan(0);
+  });
+
+  it('places known zones on the map', () => {
+    const [lat, lng] = zoneApproxLatLng('Asia/Tokyo', new Date('2023-06-01T00:00:00Z'));
+    expect(lat).toBeGreaterThan(30);
+    expect(lng).toBeGreaterThan(130);
   });
 });
 

@@ -10,6 +10,7 @@ import { base64Encode, base64Decode, urlEncode, urlDecode } from './encoders';
 import { textDiff } from './textDiff';
 import { jsonDiff } from './jsonDiff';
 import { unixTime } from './unixTime';
+import { timezoneConverter } from './timezone';
 import { uuidGenerator } from './uuid';
 import { caseConvert } from './caseConvert';
 
@@ -39,6 +40,7 @@ export const registry = new ToolRegistry()
   .register(jsonDiff)
   // Time
   .register(unixTime)
+  .register(timezoneConverter)
   // Generate
   .register(uuidGenerator);
 
@@ -57,6 +59,7 @@ export {
   textDiff,
   jsonDiff,
   unixTime,
+  timezoneConverter,
   uuidGenerator,
   caseConvert,
 };

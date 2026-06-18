@@ -68,7 +68,16 @@ export interface GeneratorTool extends CommonTool {
   generate(options: ToolOptions): ToolResult;
 }
 
-export type Tool = TransformTool | DiffTool | GeneratorTool;
+/**
+ * A tool with a fully bespoke UI (e.g. the timezone converter's world map). Core only
+ * declares it exists + its metadata; the web app supplies the component and uses the pure
+ * helper functions exported from core for the actual logic.
+ */
+export interface CustomTool extends CommonTool {
+  kind: 'custom';
+}
+
+export type Tool = TransformTool | DiffTool | GeneratorTool | CustomTool;
 
 export function isDiffTool(tool: Tool): tool is DiffTool {
   return tool.kind === 'diff';
@@ -76,6 +85,10 @@ export function isDiffTool(tool: Tool): tool is DiffTool {
 
 export function isGeneratorTool(tool: Tool): tool is GeneratorTool {
   return tool.kind === 'generate';
+}
+
+export function isCustomTool(tool: Tool): tool is CustomTool {
+  return tool.kind === 'custom';
 }
 
 /** Builds the default option map for a tool from its declared fields. */

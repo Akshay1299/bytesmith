@@ -1,9 +1,12 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { registry, defaultOptions, isDiffTool, isGeneratorTool, type ToolOptions } from '@bytesmith/core';
+import { registry, defaultOptions, isDiffTool, isGeneratorTool, isCustomTool, type ToolOptions } from '@bytesmith/core';
 import { ToolRail } from './components/ToolRail';
 import { Workspace } from './components/Workspace';
 import { DiffWorkspace } from './components/DiffWorkspace';
 import { GeneratorWorkspace } from './components/GeneratorWorkspace';
+import { UnixTimeView } from './components/UnixTimeView';
+import { TimezoneView } from './components/TimezoneView';
+import type { ComponentType } from 'react';
 import { CommandPalette } from './components/CommandPalette';
 import { ToastProvider } from './components/toast';
 import { Logo } from './components/Logo';
@@ -20,6 +23,12 @@ const EMPTY: ToolState = { a: '', b: '' };
 const ALL_TOOLS = registry.all();
 const GROUPS = registry.grouped();
 const DEFAULT_ID = ALL_TOOLS[0].id;
+
+/** Bespoke UIs for `custom`-kind tools, keyed by tool id. */
+const CUSTOM_VIEWS: Record<string, ComponentType> = {
+  'unix-time': UnixTimeView,
+  timezone: TimezoneView,
+};
 
 /** Keeps the active tool id in sync with the URL hash (deep-linkable, back-button aware). */
 function useHashTool(): [string, (id: string) => void] {
@@ -71,7 +80,7 @@ export default function App() {
   const debB = useDebounced(st.b, 120, tool.id);
 
   const transformResult = useMemo(() => {
-    if (isDiffTool(tool) || isGeneratorTool(tool)) return null;
+    if (isDiffTool(tool) || isGeneratorTool(tool) || isCustomTool(tool)) return null;
     return tool.run(debA, options);
   }, [tool, debA, options]);
 
@@ -129,7 +138,12 @@ export default function App() {
           onClose={() => setMenuOpen(false)}
         />
         {menuOpen && <div className="rail-scrim" onClick={() => setMenuOpen(false)} />}
-        {isDiffTool(tool) ? (
+        {isCustomTool(tool) ? (
+          (() => {
+            const View = CUSTOM_VIEWS[tool.id];
+            return View ? <View /> : null;
+          })()
+        ) : isDiffTool(tool) ? (
           <DiffWorkspace tool={tool} left={st.a} right={st.b} onLeft={setA} onRight={setB} result={diffResult!} />
         ) : isGeneratorTool(tool) ? (
           <GeneratorWorkspace tool={tool} value={st.a} onChange={setA} options={options} onOption={setOption} />
