@@ -1,7 +1,16 @@
 import { describe, it, expect } from 'vitest';
 import { defaultOptions } from '../types';
 import { friendlyJsonError } from '../util/json';
+import { lineDiff, countChanges } from '../util/diff';
 import { registry } from '../tools/index';
+import {
+  base64Encode,
+  base64Decode,
+  urlEncode,
+  urlDecode,
+  textDiff,
+  jsonDiff,
+} from '../tools/index';
 import {
   jsonParseString,
   jsonEscape,
@@ -60,6 +69,67 @@ describe('json-size', () => {
     // "€" is 3 bytes in UTF-8
     const res = run(jsonSize, '€');
     expect(res.meta?.bytes).toBe(3);
+  });
+});
+
+describe('encoders', () => {
+  it('base64 round-trips UTF-8 (incl. emoji)', () => {
+    const raw = 'Hello — 🔨';
+    const encoded = base64Encode.run(raw, {}).output;
+    expect(base64Decode.run(encoded, {}).output).toBe(raw);
+  });
+
+  it('flags invalid base64', () => {
+    expect(base64Decode.run('not*valid*b64', {}).error).toBeTruthy();
+  });
+
+  it('url-encode round-trips', () => {
+    const raw = 'name=byte smith&tag=a/b?c';
+    const encoded = urlEncode.run(raw, {}).output;
+    expect(encoded).not.toContain(' ');
+    expect(urlDecode.run(encoded, {}).output).toBe(raw);
+  });
+});
+
+describe('lineDiff', () => {
+  it('detects an equal/change/add sequence', () => {
+    const rows = lineDiff('a\nb\nc', 'a\nB\nc\nd');
+    expect(rows[0]).toMatchObject({ type: 'equal' });
+    expect(rows[1]).toMatchObject({ type: 'change' });
+    expect(rows[2]).toMatchObject({ type: 'equal' });
+    expect(rows[3]).toMatchObject({ type: 'add' });
+    expect(countChanges(rows)).toEqual({ added: 2, removed: 1 });
+  });
+
+  it('is all-equal for identical text', () => {
+    const rows = lineDiff('x\ny', 'x\ny');
+    expect(rows.every((r) => r.type === 'equal')).toBe(true);
+  });
+});
+
+describe('json-diff', () => {
+  it('ignores key order and whitespace', () => {
+    const res = jsonDiff.diff('{"a":1,"b":2}', '{ "b": 2, "a": 1 }', {});
+    expect(res.error).toBeUndefined();
+    expect(res.rows.every((r) => r.type === 'equal')).toBe(true);
+  });
+
+  it('surfaces real value changes', () => {
+    const res = jsonDiff.diff('{"a":1}', '{"a":2}', {});
+    expect(res.meta?.added).toBeGreaterThan(0);
+  });
+
+  it('reports which side is invalid', () => {
+    const res = jsonDiff.diff('{bad}', '{"a":1}', {});
+    expect(res.error).toMatch(/^Left:/);
+  });
+});
+
+describe('text-diff tool', () => {
+  it('produces rows + meta', () => {
+    const res = textDiff.diff('one\ntwo', 'one\n2', {});
+    expect(res.rows.length).toBeGreaterThan(0);
+    expect(res.meta).toBeDefined();
   });
 });
 

@@ -1,12 +1,12 @@
 import { useEffect, useState } from 'react';
 import { ArrowRight, ClipboardPaste, Copy, Eraser, FlaskConical } from 'lucide-react';
-import type { Tool, ToolOptions, ToolResult } from '@bytesmith/core';
+import type { TransformTool, ToolOptions, ToolResult } from '@bytesmith/core';
 import { CodeEditor } from './CodeEditor';
 import { OptionsBar } from './OptionsBar';
 import { useToast } from './toast';
 
 interface Props {
-  tool: Tool;
+  tool: TransformTool;
   input: string;
   onInput: (v: string) => void;
   options: ToolOptions;

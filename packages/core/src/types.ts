@@ -1,3 +1,5 @@
+import type { DiffRow } from './util/diff';
+
 /** High-level grouping a tool belongs to (drives the sidebar sections). */
 export type ToolCategory = 'json' | 'string' | 'encode' | 'diff' | 'convert';
 
@@ -11,7 +13,7 @@ export interface ToolOptionField {
   options?: { label: string; value: string }[];
 }
 
-/** The result of running a tool. Tools never throw — failures land in {@link error}. */
+/** The result of running a transform tool. Tools never throw — failures land in {@link error}. */
 export interface ToolResult {
   output: string;
   /** User-facing message when the input could not be processed. */
@@ -20,27 +22,51 @@ export interface ToolResult {
   meta?: Record<string, unknown>;
 }
 
-/**
- * The contract every tool implements. A tool is a pure, side-effect-free unit:
- * the same `(input, options)` always yields the same {@link ToolResult}. This is what
- * makes the catalog trivially testable and lets the UI stay generic — it only ever talks
- * to this interface, never to a concrete tool (Dependency Inversion).
- */
-export interface Tool {
+/** The result of running a diff tool. */
+export interface DiffResult {
+  rows: DiffRow[];
+  error?: string;
+  meta?: { added: number; removed: number };
+}
+
+export type ToolOptions = Record<string, boolean | string>;
+
+interface CommonTool {
   id: string;
   name: string;
   category: ToolCategory;
   description: string;
   /** Search aliases — what people actually type ("format", "unescape", "compress"). */
   keywords?: string[];
-  /** One-click example input shown in the UI. */
-  sample?: string;
   /** Tool-specific options rendered as a compact control row. */
   options?: ToolOptionField[];
+}
+
+/**
+ * A single-input transform tool — a pure, side-effect-free unit: the same `(input, options)`
+ * always yields the same {@link ToolResult}. The UI only talks to this interface, never to a
+ * concrete tool (Dependency Inversion).
+ */
+export interface TransformTool extends CommonTool {
+  kind?: 'transform';
+  /** One-click example input shown in the UI. */
+  sample?: string;
   run(input: string, options: ToolOptions): ToolResult;
 }
 
-export type ToolOptions = Record<string, boolean | string>;
+/** A two-input diff tool that produces aligned side-by-side rows. */
+export interface DiffTool extends CommonTool {
+  kind: 'diff';
+  sampleLeft?: string;
+  sampleRight?: string;
+  diff(left: string, right: string, options: ToolOptions): DiffResult;
+}
+
+export type Tool = TransformTool | DiffTool;
+
+export function isDiffTool(tool: Tool): tool is DiffTool {
+  return tool.kind === 'diff';
+}
 
 /** Builds the default option map for a tool from its declared fields. */
 export function defaultOptions(tool: Tool): ToolOptions {

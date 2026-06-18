@@ -14,13 +14,14 @@ interface Props {
 export function ToolRail({ groups, activeId, onSelect, onOpenPalette }: Props) {
   return (
     <aside className="rail">
-      <div className="rail__brand">
+      {/* Home: a real link to the base URL so it reloads to a fresh default state. */}
+      <a className="rail__brand" href={import.meta.env.BASE_URL} title="Bytesmith — reload">
         <Logo />
         <div>
           <div className="rail__title">Byte<b>smith</b></div>
           <div className="rail__tag">forge for JSON · strings · diffs</div>
         </div>
-      </div>
+      </a>
 
       <button className="rail__search" onClick={onOpenPalette}>
         <Search size={14} />

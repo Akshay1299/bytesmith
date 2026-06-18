@@ -1,10 +1,18 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { registry, defaultOptions, type ToolOptions } from '@bytesmith/core';
+import { registry, defaultOptions, isDiffTool, type ToolOptions } from '@bytesmith/core';
 import { ToolRail } from './components/ToolRail';
 import { Workspace } from './components/Workspace';
+import { DiffWorkspace } from './components/DiffWorkspace';
 import { CommandPalette } from './components/CommandPalette';
 import { ToastProvider } from './components/toast';
 import { useDebounced } from './hooks/useDebounced';
+
+/** Per-tool buffers: `a` is the single/left input, `b` is the right input (diff tools). */
+interface ToolState {
+  a: string;
+  b: string;
+}
+const EMPTY: ToolState = { a: '', b: '' };
 
 const ALL_TOOLS = registry.all();
 const GROUPS = registry.grouped();
@@ -28,22 +36,36 @@ export default function App() {
   const [activeId, selectId] = useHashTool();
   const tool = registry.get(activeId) ?? ALL_TOOLS[0];
 
-  // Per-tool input: each tool keeps its own buffer, so switching tools shows that tool's
-  // own state (blank until used) and returning restores it. State is in-memory only —
-  // a full page refresh starts everything fresh, by design.
-  const [inputsById, setInputsById] = useState<Record<string, string>>({});
+  // Per-tool buffers: each tool keeps its own input(s), so switching tools shows that tool's
+  // own state (blank until used) and returning restores it. In-memory only — a full page
+  // refresh starts everything fresh, by design.
+  const [stateById, setStateById] = useState<Record<string, ToolState>>({});
   const [optionsById, setOptionsById] = useState<Record<string, ToolOptions>>({});
   const [paletteOpen, setPaletteOpen] = useState(false);
 
-  const input = inputsById[tool.id] ?? '';
-  const setInput = useCallback(
-    (value: string) => setInputsById((prev) => ({ ...prev, [tool.id]: value })),
+  const st = stateById[tool.id] ?? EMPTY;
+  const setA = useCallback(
+    (value: string) => setStateById((prev) => ({ ...prev, [tool.id]: { ...(prev[tool.id] ?? EMPTY), a: value } })),
+    [tool.id],
+  );
+  const setB = useCallback(
+    (value: string) => setStateById((prev) => ({ ...prev, [tool.id]: { ...(prev[tool.id] ?? EMPTY), b: value } })),
     [tool.id],
   );
 
   const options = optionsById[tool.id] ?? defaultOptions(tool);
-  const debouncedInput = useDebounced(input, 120, tool.id);
-  const result = useMemo(() => tool.run(debouncedInput, options), [tool, debouncedInput, options]);
+  const debA = useDebounced(st.a, 120, tool.id);
+  const debB = useDebounced(st.b, 120, tool.id);
+
+  const transformResult = useMemo(() => {
+    if (isDiffTool(tool)) return null;
+    return tool.run(debA, options);
+  }, [tool, debA, options]);
+
+  const diffResult = useMemo(() => {
+    if (!isDiffTool(tool)) return null;
+    return tool.diff(debA, debB, options);
+  }, [tool, debA, debB, options]);
 
   const setOption = useCallback(
     (key: string, value: boolean | string) => {
@@ -71,14 +93,11 @@ export default function App() {
     <ToastProvider>
       <div className="app">
         <ToolRail groups={GROUPS} activeId={tool.id} onSelect={selectId} onOpenPalette={() => setPaletteOpen(true)} />
-        <Workspace
-          tool={tool}
-          input={input}
-          onInput={setInput}
-          options={options}
-          onOption={setOption}
-          result={result}
-        />
+        {isDiffTool(tool) ? (
+          <DiffWorkspace tool={tool} left={st.a} right={st.b} onLeft={setA} onRight={setB} result={diffResult!} />
+        ) : (
+          <Workspace tool={tool} input={st.a} onInput={setA} options={options} onOption={setOption} result={transformResult!} />
+        )}
       </div>
       <CommandPalette open={paletteOpen} tools={ALL_TOOLS} onSelect={selectId} onClose={() => setPaletteOpen(false)} />
     </ToastProvider>

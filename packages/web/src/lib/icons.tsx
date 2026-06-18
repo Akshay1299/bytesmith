@@ -12,6 +12,8 @@ import {
   GitCompareArrows,
   Repeat,
   Gauge,
+  Link,
+  FileJson,
   type LucideProps,
 } from 'lucide-react';
 
@@ -26,6 +28,12 @@ const TOOL_ICONS: Record<string, Icon> = {
   'json-validate': ShieldCheck,
   'json-sort-keys': ArrowDownAZ,
   'json-size': Gauge,
+  'base64-encode': Binary,
+  'base64-decode': Binary,
+  'url-encode': Link,
+  'url-decode': Link,
+  'text-diff': GitCompareArrows,
+  'json-diff': FileJson,
 };
 
 const CATEGORY_ICONS: Record<ToolCategory, Icon> = {

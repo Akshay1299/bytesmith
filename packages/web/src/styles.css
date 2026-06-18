@@ -60,6 +60,8 @@ a { color: var(--accent); text-decoration: none; }
   backdrop-filter: blur(6px);
 }
 .rail__brand { display: flex; align-items: center; gap: 11px; padding: 18px 18px 14px; }
+a.rail__brand { text-decoration: none; color: inherit; border-radius: 12px; margin: 6px 8px 4px; transition: background 0.15s; }
+a.rail__brand:hover { background: rgba(255, 255, 255, 0.04); }
 .rail__title { font-weight: 800; font-size: 18px; letter-spacing: -0.2px; }
 .rail__title b {
   background: linear-gradient(95deg, var(--ember-3), var(--ember-1));
@@ -189,6 +191,27 @@ a { color: var(--accent); text-decoration: none; }
 @keyframes forgePulse { 0% { box-shadow: 0 0 0 0 var(--glow); } 50% { box-shadow: 0 0 26px 4px var(--glow); } 100% { box-shadow: 0 0 14px 0 var(--glow); } }
 .spark { position: absolute; top: 50%; left: 50%; width: 4px; height: 4px; margin: -2px 0 0 -2px; border-radius: 50%; background: var(--ember-3); box-shadow: 0 0 6px var(--ember-2); pointer-events: none; }
 @keyframes sparkFly { from { transform: translate(0, 0); opacity: 1; } to { transform: translate(var(--dx), var(--dy)); opacity: 0; } }
+
+/* diff workspace -------------------------------------------- */
+.diff-layout { display: flex; flex-direction: column; gap: 14px; flex: 1; min-height: 0; }
+.diff-inputs { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; flex: 0 0 38%; min-height: 0; }
+.diff-result { flex: 1; min-height: 0; }
+.diff-summary { margin-left: auto; display: flex; gap: 12px; font-family: var(--mono); font-size: 12px; font-weight: 600; }
+.diff-summary .add { color: var(--ok); }
+.diff-summary .del { color: var(--bad); }
+.diff { height: 100%; overflow: auto; font-family: var(--mono); font-size: 12.5px; line-height: 1.55; }
+.diff-row { display: grid; grid-template-columns: 1fr 1fr; }
+.diff-cell { display: grid; grid-template-columns: 46px 1fr; border-bottom: 1px solid rgba(255, 255, 255, 0.025); }
+.diff-row .diff-cell:first-child { border-right: 1px solid var(--border); }
+.diff-cell .ln { text-align: right; padding: 1px 8px; color: var(--faint); user-select: none; }
+.diff-cell .tx { padding: 1px 10px; white-space: pre-wrap; word-break: break-word; color: var(--text); }
+.diff-cell.add { background: rgba(70, 211, 154, 0.12); }
+.diff-cell.add .tx { color: #c7f3dd; }
+.diff-cell.add .ln { color: rgba(70, 211, 154, 0.7); }
+.diff-cell.del { background: rgba(255, 93, 108, 0.12); }
+.diff-cell.del .tx { color: #ffccd1; }
+.diff-cell.del .ln { color: rgba(255, 93, 108, 0.7); }
+.diff-cell.empty { background: rgba(255, 255, 255, 0.012); }
 
 /* command palette ------------------------------------------- */
 .palette-scrim { position: fixed; inset: 0; background: rgba(5, 6, 9, 0.6); backdrop-filter: blur(3px); z-index: 50; display: grid; place-items: start center; padding-top: 14vh; }
