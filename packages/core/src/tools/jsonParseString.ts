@@ -12,6 +12,7 @@ export const jsonParseString: Tool = {
   name: 'JSON Parse String',
   category: 'json',
   description: 'Decode an escaped JSON string (\\n, \\", \\t, \\uXXXX) into raw, readable text.',
+  keywords: ['unescape', 'decode', 'parse', 'unstringify', 'raw', 'unwrap', 'literal'],
   sample: '"Hello,\\n\\t\\"world\\"\\nLine \\u2014 three"',
   run(input) {
     if (!input.trim()) {

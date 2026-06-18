@@ -31,6 +31,8 @@ export interface Tool {
   name: string;
   category: ToolCategory;
   description: string;
+  /** Search aliases — what people actually type ("format", "unescape", "compress"). */
+  keywords?: string[];
   /** One-click example input shown in the UI. */
   sample?: string;
   /** Tool-specific options rendered as a compact control row. */

@@ -54,3 +54,15 @@ export function friendlyJsonError(source: string, error: Error): string {
 export function resolveIndent(indent: string): string | number {
   return indent === 'tab' ? '\t' : Number(indent);
 }
+
+/** Human-readable byte size: 942 B, 12.3 KB, 1.45 MB. */
+export function formatBytes(n: number): string {
+  if (n < 1024) return `${n} B`;
+  if (n < 1024 * 1024) return `${(n / 1024).toFixed(n < 10 * 1024 ? 2 : 1)} KB`;
+  return `${(n / (1024 * 1024)).toFixed(2)} MB`;
+}
+
+/** UTF-8 byte length of a string (what actually travels over the wire / disk). */
+export function byteLength(text: string): number {
+  return new TextEncoder().encode(text).length;
+}

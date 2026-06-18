@@ -7,6 +7,7 @@ export const jsonBeautify: Tool = {
   name: 'JSON Beautify',
   category: 'json',
   description: 'Pretty-print and validate JSON with configurable indentation.',
+  keywords: ['format', 'pretty', 'prettify', 'prettyprint', 'indent', 'expand', 'beautifier'],
   sample: '{"name":"bytesmith","tags":["json","string","diff"],"nested":{"b":2,"a":1}}',
   options: [
     {

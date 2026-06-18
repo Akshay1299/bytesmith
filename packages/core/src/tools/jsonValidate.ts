@@ -14,6 +14,7 @@ export const jsonValidate: Tool = {
   name: 'JSON Validate',
   category: 'json',
   description: 'Check whether the input is valid JSON and summarize its shape.',
+  keywords: ['check', 'lint', 'verify', 'valid', 'is valid', 'error', 'syntax'],
   sample: '{"ok": true, "items": [1, 2, 3], "meta": null}',
   run(input) {
     const trimmed = input.trim();

@@ -9,6 +9,7 @@ export const jsonEscape: Tool = {
   name: 'JSON Escape String',
   category: 'json',
   description: 'Escape raw text into a JSON string (newlines, quotes, tabs → \\n, \\", \\t).',
+  keywords: ['escape', 'stringify', 'encode', 'quote', 'wrap', 'serialize'],
   sample: 'Hello,\n\t"world"\nLine — three',
   options: [{ key: 'quotes', label: 'Wrap in quotes', type: 'boolean', default: true }],
   run(input, options) {

@@ -7,6 +7,7 @@ export const jsonSortKeys: Tool = {
   name: 'JSON Sort Keys',
   category: 'json',
   description: 'Recursively sort all object keys alphabetically (great before diffing).',
+  keywords: ['sort', 'order', 'alphabetize', 'alphabetical', 'stable', 'reorder', 'keys'],
   sample: '{"name":"bytesmith","age":1,"tags":["b","a"],"nested":{"z":1,"a":2}}',
   options: [
     {

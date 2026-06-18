@@ -11,6 +11,7 @@ import {
   Binary,
   GitCompareArrows,
   Repeat,
+  Gauge,
   type LucideProps,
 } from 'lucide-react';
 
@@ -24,6 +25,7 @@ const TOOL_ICONS: Record<string, Icon> = {
   'json-minify': Minimize2,
   'json-validate': ShieldCheck,
   'json-sort-keys': ArrowDownAZ,
+  'json-size': Gauge,
 };
 
 const CATEGORY_ICONS: Record<ToolCategory, Icon> = {

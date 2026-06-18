@@ -7,6 +7,7 @@ export const jsonMinify: Tool = {
   name: 'JSON Minify',
   category: 'json',
   description: 'Compress JSON to a single line by removing all insignificant whitespace.',
+  keywords: ['compress', 'minimize', 'compact', 'shrink', 'one line', 'uglify', 'strip'],
   sample: '{\n  "name": "bytesmith",\n  "tags": ["json", "string"]\n}',
   run(input) {
     const trimmed = input.trim();

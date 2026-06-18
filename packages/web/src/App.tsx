@@ -28,12 +28,21 @@ export default function App() {
   const [activeId, selectId] = useHashTool();
   const tool = registry.get(activeId) ?? ALL_TOOLS[0];
 
-  const [input, setInput] = useState('');
+  // Per-tool input: each tool keeps its own buffer, so switching tools shows that tool's
+  // own state (blank until used) and returning restores it. State is in-memory only —
+  // a full page refresh starts everything fresh, by design.
+  const [inputsById, setInputsById] = useState<Record<string, string>>({});
   const [optionsById, setOptionsById] = useState<Record<string, ToolOptions>>({});
   const [paletteOpen, setPaletteOpen] = useState(false);
 
+  const input = inputsById[tool.id] ?? '';
+  const setInput = useCallback(
+    (value: string) => setInputsById((prev) => ({ ...prev, [tool.id]: value })),
+    [tool.id],
+  );
+
   const options = optionsById[tool.id] ?? defaultOptions(tool);
-  const debouncedInput = useDebounced(input, 120);
+  const debouncedInput = useDebounced(input, 120, tool.id);
   const result = useMemo(() => tool.run(debouncedInput, options), [tool, debouncedInput, options]);
 
   const setOption = useCallback(

@@ -20,7 +20,11 @@ export function CommandPalette({ open, tools, onSelect, onClose }: Props) {
     const q = query.trim().toLowerCase();
     if (!q) return tools;
     return tools.filter(
-      (t) => t.name.toLowerCase().includes(q) || t.description.toLowerCase().includes(q) || t.id.includes(q),
+      (t) =>
+        t.name.toLowerCase().includes(q) ||
+        t.description.toLowerCase().includes(q) ||
+        t.id.includes(q) ||
+        (t.keywords ?? []).some((k) => k.includes(q) || q.includes(k)),
     );
   }, [query, tools]);
 

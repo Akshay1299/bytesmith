@@ -9,6 +9,7 @@ import {
   jsonMinify,
   jsonValidate,
   jsonSortKeys,
+  jsonSize,
 } from '../tools/index';
 
 const run = (tool: typeof jsonBeautify, input: string, opts?: Record<string, boolean | string>) =>
@@ -28,6 +29,37 @@ describe('registry', () => {
   it('groups by category', () => {
     const groups = registry.grouped();
     expect(groups[0].category).toBe('json');
+  });
+
+  it('orders Beautify first (most-used)', () => {
+    expect(registry.all()[0].id).toBe('json-beautify');
+  });
+
+  it('exposes keyword aliases for discovery', () => {
+    expect(registry.get('json-beautify')?.keywords).toContain('format');
+    expect(registry.get('json-parse-string')?.keywords).toContain('unescape');
+    expect(registry.get('json-minify')?.keywords).toContain('compress');
+  });
+});
+
+describe('json-size', () => {
+  it('reports byte size and minified size for JSON', () => {
+    const res = run(jsonSize, '{\n  "a": 1,\n  "b": 2\n}');
+    expect(res.output).toMatch(/Size/);
+    expect(res.output).toMatch(/Minified/);
+    expect(res.meta?.bytes).toBeGreaterThan(0);
+  });
+
+  it('reports raw size for non-JSON without a minified line', () => {
+    const res = run(jsonSize, 'just some text');
+    expect(res.output).toMatch(/Size/);
+    expect(res.output).not.toMatch(/Minified/);
+  });
+
+  it('counts multi-byte characters as their UTF-8 byte length', () => {
+    // "€" is 3 bytes in UTF-8
+    const res = run(jsonSize, '€');
+    expect(res.meta?.bytes).toBe(3);
   });
 });
 
