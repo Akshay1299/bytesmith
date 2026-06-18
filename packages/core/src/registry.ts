@@ -25,7 +25,7 @@ export class ToolRegistry {
 
   /** Tools grouped by category, preserving registration order within each group. */
   grouped(): { category: ToolCategory; tools: Tool[] }[] {
-    const order: ToolCategory[] = ['json', 'string', 'diff', 'time', 'generate', 'convert', 'encode'];
+    const order: ToolCategory[] = ['json', 'diff', 'time', 'generate', 'string', 'encode', 'convert'];
     const byCat = new Map<ToolCategory, Tool[]>();
     for (const tool of this.tools.values()) {
       const list = byCat.get(tool.category) ?? [];
