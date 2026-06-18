@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { lazy, Suspense, useEffect, useMemo, useState } from 'react';
 import { ArrowLeftRight, CalendarClock, Clock, Copy } from 'lucide-react';
 import {
   listTimeZones,
@@ -11,8 +11,10 @@ import {
   sunAltitudeSin,
   subsolarPoint,
 } from '@bytesmith/core';
-import { WorldMap, type MapPin } from './WorldMap';
+import type { MapPin } from './WorldMap';
 import { useToast } from './toast';
+
+const Globe3D = lazy(() => import('./Globe3D'));
 
 const RAW_ZONES = listTimeZones();
 const HAS = new Set(RAW_ZONES);
@@ -205,7 +207,9 @@ export function TimezoneView() {
         <b>{cityLabel(toZone)}</b> is <b>{diffLabel(fromOff, toOff)}</b> <b>{cityLabel(fromZone)}</b>
       </div>
 
-      <WorldMap instantMs={instant} pins={pins} />
+      <Suspense fallback={<div className="globe3d globe3d--loading">Summoning the globe…</div>}>
+        <Globe3D pins={pins.map((p) => ({ lat: p.lat, lng: p.lng, color: p.color, label: `${p.label} · ${p.sublabel}` }))} />
+      </Suspense>
     </section>
   );
 }

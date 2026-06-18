@@ -275,6 +275,9 @@ a.rail__brand:hover { background: rgba(255, 255, 255, 0.04); }
 .tz-diff { color: var(--muted); font-size: 13px; margin-bottom: 14px; }
 .tz-diff b { color: var(--text); font-weight: 600; }
 
+.globe3d { position: relative; flex: 1; min-height: 360px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #05080e; }
+.globe3d canvas { display: block; }
+.globe3d--loading { display: grid; place-items: center; color: var(--muted); font-size: 13px; }
 .worldmap { position: relative; flex: 1; min-height: 200px; border: 1px solid var(--border); border-radius: var(--radius); overflow: hidden; background: #0a1018; }
 .worldmap__svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .wm-pin { position: absolute; transform: translate(-50%, -50%); pointer-events: none; }
