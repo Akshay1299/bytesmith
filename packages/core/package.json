@@ -1,0 +1,19 @@
+{
+  "name": "@bytesmith/core",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "Framework-agnostic developer-tool transforms (pure functions) and the tool registry.",
+  "main": "./src/index.ts",
+  "types": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "vitest": "^2.1.8"
+  }
+}
