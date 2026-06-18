@@ -69,8 +69,10 @@ export function formatInZone(date: Date, timeZone: string): { time: string; date
 }
 
 /** Interprets wall-clock fields as being in `timeZone` and returns the UTC instant (ms). */
-export function zonedWallToInstant(y: number, mo: number, d: number, h: number, mi: number, timeZone: string): number {
-  const guess = Date.UTC(y, mo - 1, d, h, mi);
+export function zonedWallToInstant(
+  y: number, mo: number, d: number, h: number, mi: number, timeZone: string, s = 0,
+): number {
+  const guess = Date.UTC(y, mo - 1, d, h, mi, s);
   const offset = getOffsetMinutes(timeZone, new Date(guess));
   return guess - offset * 60000;
 }
