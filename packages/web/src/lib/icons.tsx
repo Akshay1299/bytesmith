@@ -14,6 +14,9 @@ import {
   Gauge,
   Link,
   FileJson,
+  Clock,
+  Fingerprint,
+  Clock3,
   type LucideProps,
 } from 'lucide-react';
 
@@ -34,6 +37,8 @@ const TOOL_ICONS: Record<string, Icon> = {
   'url-decode': Link,
   'text-diff': GitCompareArrows,
   'json-diff': FileJson,
+  'unix-time': Clock,
+  'uuid-generator': Fingerprint,
 };
 
 const CATEGORY_ICONS: Record<ToolCategory, Icon> = {
@@ -42,6 +47,8 @@ const CATEGORY_ICONS: Record<ToolCategory, Icon> = {
   encode: Binary,
   diff: GitCompareArrows,
   convert: Repeat,
+  time: Clock3,
+  generate: Fingerprint,
 };
 
 export const CATEGORY_LABELS: Record<ToolCategory, string> = {
@@ -50,6 +57,8 @@ export const CATEGORY_LABELS: Record<ToolCategory, string> = {
   encode: 'Encode',
   convert: 'Convert',
   diff: 'Diff',
+  time: 'Time',
+  generate: 'Generate',
 };
 
 export function toolIcon(id: string, category: ToolCategory): Icon {

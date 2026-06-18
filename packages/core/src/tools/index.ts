@@ -9,6 +9,8 @@ import { jsonSize } from './jsonSize';
 import { base64Encode, base64Decode, urlEncode, urlDecode } from './encoders';
 import { textDiff } from './textDiff';
 import { jsonDiff } from './jsonDiff';
+import { unixTime } from './unixTime';
+import { uuidGenerator } from './uuid';
 
 /**
  * The single source of truth for the tool catalog. Order here is the display order in the
@@ -31,7 +33,11 @@ export const registry = new ToolRegistry()
   .register(urlDecode)
   // Diff
   .register(textDiff)
-  .register(jsonDiff);
+  .register(jsonDiff)
+  // Time
+  .register(unixTime)
+  // Generate
+  .register(uuidGenerator);
 
 export {
   jsonBeautify,
@@ -47,4 +53,6 @@ export {
   urlDecode,
   textDiff,
   jsonDiff,
+  unixTime,
+  uuidGenerator,
 };

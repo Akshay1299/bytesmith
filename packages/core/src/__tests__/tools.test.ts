@@ -10,6 +10,8 @@ import {
   urlDecode,
   textDiff,
   jsonDiff,
+  unixTime,
+  uuidGenerator,
 } from '../tools/index';
 import {
   jsonParseString,
@@ -130,6 +132,46 @@ describe('text-diff tool', () => {
     const res = textDiff.diff('one\ntwo', 'one\n2', {});
     expect(res.rows.length).toBeGreaterThan(0);
     expect(res.meta).toBeDefined();
+  });
+});
+
+describe('unix-time', () => {
+  it('converts epoch seconds to ISO/UTC', () => {
+    const res = unixTime.run('1700000000', {});
+    expect(res.output).toContain('2023-11-14T22:13:20.000Z');
+    expect(res.output).toMatch(/Unix \(s\)\s*: 1700000000/);
+    expect(res.output).toContain('detected: seconds');
+  });
+
+  it('treats large numbers as milliseconds', () => {
+    const res = unixTime.run('1700000000000', {});
+    expect(res.output).toContain('2023-11-14T22:13:20.000Z');
+    expect(res.output).toContain('detected: milliseconds');
+  });
+
+  it('parses a date string back to epoch', () => {
+    const res = unixTime.run('2023-11-14T22:13:20Z', {});
+    expect(res.output).toMatch(/Unix \(s\)\s*: 1700000000/);
+  });
+
+  it('errors on garbage', () => {
+    expect(unixTime.run('not a date', {}).error).toBeTruthy();
+  });
+});
+
+describe('uuid-generator', () => {
+  const V4 = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+  it('generates the requested count of valid v4 UUIDs', () => {
+    const res = uuidGenerator.generate({ count: '5', uppercase: false, hyphens: true });
+    const ids = res.output.split('\n');
+    expect(ids).toHaveLength(5);
+    expect(ids.every((id) => V4.test(id))).toBe(true);
+  });
+
+  it('honors uppercase and hyphen options', () => {
+    const res = uuidGenerator.generate({ count: '1', uppercase: true, hyphens: false });
+    expect(res.output).toMatch(/^[0-9A-F]{32}$/);
   });
 });
 

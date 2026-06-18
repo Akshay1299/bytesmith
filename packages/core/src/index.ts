@@ -2,13 +2,14 @@ export type {
   Tool,
   TransformTool,
   DiffTool,
+  GeneratorTool,
   ToolCategory,
   ToolOptionField,
   ToolOptions,
   ToolResult,
   DiffResult,
 } from './types';
-export { defaultOptions, isDiffTool } from './types';
+export { defaultOptions, isDiffTool, isGeneratorTool } from './types';
 export { ToolRegistry } from './registry';
 export { registry } from './tools/index';
 export { sortDeep, friendlyJsonError, resolveIndent, formatBytes, byteLength } from './util/json';

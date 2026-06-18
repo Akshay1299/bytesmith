@@ -1,8 +1,9 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
-import { registry, defaultOptions, isDiffTool, type ToolOptions } from '@bytesmith/core';
+import { registry, defaultOptions, isDiffTool, isGeneratorTool, type ToolOptions } from '@bytesmith/core';
 import { ToolRail } from './components/ToolRail';
 import { Workspace } from './components/Workspace';
 import { DiffWorkspace } from './components/DiffWorkspace';
+import { GeneratorWorkspace } from './components/GeneratorWorkspace';
 import { CommandPalette } from './components/CommandPalette';
 import { ToastProvider } from './components/toast';
 import { useDebounced } from './hooks/useDebounced';
@@ -58,7 +59,7 @@ export default function App() {
   const debB = useDebounced(st.b, 120, tool.id);
 
   const transformResult = useMemo(() => {
-    if (isDiffTool(tool)) return null;
+    if (isDiffTool(tool) || isGeneratorTool(tool)) return null;
     return tool.run(debA, options);
   }, [tool, debA, options]);
 
@@ -95,6 +96,8 @@ export default function App() {
         <ToolRail groups={GROUPS} activeId={tool.id} onSelect={selectId} onOpenPalette={() => setPaletteOpen(true)} />
         {isDiffTool(tool) ? (
           <DiffWorkspace tool={tool} left={st.a} right={st.b} onLeft={setA} onRight={setB} result={diffResult!} />
+        ) : isGeneratorTool(tool) ? (
+          <GeneratorWorkspace tool={tool} value={st.a} onChange={setA} options={options} onOption={setOption} />
         ) : (
           <Workspace tool={tool} input={st.a} onInput={setA} options={options} onOption={setOption} result={transformResult!} />
         )}

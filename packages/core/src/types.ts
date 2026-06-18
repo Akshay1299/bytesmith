@@ -1,7 +1,7 @@
 import type { DiffRow } from './util/diff';
 
 /** High-level grouping a tool belongs to (drives the sidebar sections). */
-export type ToolCategory = 'json' | 'string' | 'encode' | 'diff' | 'convert';
+export type ToolCategory = 'json' | 'string' | 'encode' | 'diff' | 'convert' | 'time' | 'generate';
 
 /** A single configurable option a tool exposes in the UI. */
 export interface ToolOptionField {
@@ -62,10 +62,20 @@ export interface DiffTool extends CommonTool {
   diff(left: string, right: string, options: ToolOptions): DiffResult;
 }
 
-export type Tool = TransformTool | DiffTool;
+/** A no-input generator (UUIDs, passwords, …) that produces output on demand. */
+export interface GeneratorTool extends CommonTool {
+  kind: 'generate';
+  generate(options: ToolOptions): ToolResult;
+}
+
+export type Tool = TransformTool | DiffTool | GeneratorTool;
 
 export function isDiffTool(tool: Tool): tool is DiffTool {
   return tool.kind === 'diff';
+}
+
+export function isGeneratorTool(tool: Tool): tool is GeneratorTool {
+  return tool.kind === 'generate';
 }
 
 /** Builds the default option map for a tool from its declared fields. */
