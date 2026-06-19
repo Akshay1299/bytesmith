@@ -1,65 +1,61 @@
 # Bytesmith
 
-### ▶ [**Live app**](https://akshay1299.github.io/bytesmith/)
+Fast, private, in-browser developer tools. Everything runs client-side — your data never leaves the browser. No ads, no sign-up, no server.
 
-Fast, **private, in-browser developer tools** for JSON and strings — parse/escape, beautify,
-minify, validate, sort keys — with diff and more on the way. Everything runs **client-side**:
-your data never leaves the browser.
+**[Live App](https://akshay1299.github.io/bytesmith/)** · [GitHub](https://github.com/Akshay1299/bytesmith)
 
-> A forge for bytes. Built as a clean, extensible full-stack project: a framework-agnostic
-> transform core, a React UI, and (soon) a Spring Boot API for share-links and programmatic use.
+---
 
-## Features (v1)
+## Tools
 
-| Tool | What it does |
-|------|--------------|
-| **JSON Parse String** | Decode an escaped JSON string (`\n`, `\"`, `\uXXXX`) into raw, readable text. |
-| **JSON Escape String** | The inverse — turn raw text into a JSON-escaped string. |
-| **JSON Beautify** | Pretty-print with configurable indent + optional key sorting. |
-| **JSON Minify** | Strip whitespace; reports how much smaller. |
-| **JSON Validate** | Validate and summarize shape; errors located by line/column. |
-| **JSON Sort Keys** | Recursively sort keys (stable diffs). |
+| Group | Tools |
+|-------|-------|
+| **JSON** | Beautify · Parse String · Minify · Validate · Sort Keys · Escape · Size |
+| **Diff** | Text Diff · JSON Diff (semantic, key-order insensitive) — side-by-side, color-coded |
+| **Time** | Unix Timestamp (epoch ⇄ Local / UTC / IST / ISO) · Timezone Converter with interactive 3D globe |
+| **Generate** | UUID v4 (count / case / hyphen options) |
+| **String** | Case Converter (camelCase / PascalCase / snake_case / kebab-case / CONSTANT / Title) |
+| **Encode** | Base64 encode/decode · URL encode/decode |
 
-Plus: a real code editor (CodeMirror) with syntax highlighting, **⌘K command palette**,
-deep-linkable tools (`#json-beautify`), one-click samples, and copy/paste.
+## Highlights
+
+- **Interactive 3D globe** (three.js / globe.gl) for the Timezone Converter — night-Earth city-lights texture, atmosphere glow, auto-rotation, and an animated arc between your two zones. Lazy-loaded so the main bundle stays light.
+- **⌘K command palette** with keyword aliases ("format", "unescape", "compress") — find any tool by what you'd type, not just its exact name.
+- **CodeMirror 6** editor with JSON syntax highlighting, a custom forge theme, and per-tool isolated state.
+- Fully responsive with a mobile slide-in drawer and deep-linkable tool routes (`#json-beautify`).
 
 ## Architecture
 
-A pnpm monorepo with a deliberately clean separation:
+pnpm monorepo with a clean logic / presentation split:
 
 ```
 bytesmith/
 ├── packages/
-│   ├── core/   # @bytesmith/core — framework-agnostic pure transforms + a Tool registry.
-│   │           #   Each tool is a pure (input, options) -> result function. Fully unit-tested.
-│   └── web/    # @bytesmith/web — React + Vite UI. Renders whatever the registry exposes,
-│               #   so adding a tool never touches the UI (Open/Closed).
-└── (planned) server/  # Spring Boot API — share-links + public REST parity.
+│   ├── core/   # @bytesmith/core — pure TypeScript. Tool registry + all transform/diff/time logic.
+│   │           # Unit-tested with Vitest. Zero React dependency.
+│   └── web/    # @bytesmith/web — React + Vite UI. Renders whatever the registry exposes;
+│               # bespoke views for rich tools (timezone globe, unix timestamp).
+└── .github/workflows/pages.yml   # CI build + deploy to GitHub Pages
 ```
 
-**Design principles:** Open/Closed (register a tool, the UI adapts), Single Responsibility
-(one pure function per tool), Dependency Inversion (UI depends on the `Tool` interface only).
+**Design decisions**
 
-## Develop
+- **Open/Closed** — register a tool and the sidebar, search, and routing pick it up with no UI edits required.
+- **Single Responsibility** — every transform is a pure `(input, options) → result` function.
+- **Privacy by default** — no backend; CSP + security headers enforced in production (`vercel.json`).
+
+## Tech stack
+
+TypeScript · React · Vite · CodeMirror 6 · Framer Motion · three.js / globe.gl · Vitest · pnpm workspaces
+
+## Local development
 
 ```bash
 pnpm install
-pnpm test         # core unit tests (Vitest)
-pnpm dev          # web app at http://localhost:5173
-pnpm build        # production build of the web app
+pnpm dev        # start Vite dev server
+pnpm test       # run @bytesmith/core unit tests
+pnpm build      # production build
+pnpm typecheck  # type-check all packages
 ```
 
-## Roadmap
-
-| Phase | Scope | State |
-|------|-------|-------|
-| 0 | Monorepo, forge design system, app shell, tool registry | ✅ |
-| 1 | JSON & string core tools | ✅ |
-| 2 | Diff checker (text + JSON), Web Workers for large inputs | ⬜ |
-| 3 | More converters (Base64, URL, JWT, YAML, hashes) | ⬜ |
-| 4 | Spring Boot backend — share links + public REST API | ⬜ |
-| 5 | PWA/offline, per-tool SEO pages, history | ⬜ |
-
-## Stack
-
-TypeScript · React + Vite · CodeMirror 6 · Framer Motion · pnpm workspaces · (planned) Java 21 + Spring Boot.
+Requires Node 20+ and pnpm.
