@@ -2,6 +2,7 @@ import CodeMirror from '@uiw/react-codemirror';
 import { json } from '@codemirror/lang-json';
 import { EditorView } from '@codemirror/view';
 import { forgeTheme } from '../lib/cm';
+import { forgeSearch } from '../lib/searchPanel';
 
 interface Props {
   value: string;
@@ -21,7 +22,7 @@ export function CodeEditor({ value, onChange, readOnly = false, language = 'text
       theme={forgeTheme}
       height="100%"
       style={{ height: '100%' }}
-      extensions={language === 'json' ? [json(), wrap] : [wrap]}
+      extensions={language === 'json' ? [json(), wrap, ...forgeSearch] : [wrap, ...forgeSearch]}
       basicSetup={{
         lineNumbers: true,
         foldGutter: false,
