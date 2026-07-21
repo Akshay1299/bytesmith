@@ -31,6 +31,7 @@ function createForgePanel(view: EditorView): Panel {
   dom.className = 'cm-bsearch';
   dom.setAttribute('role', 'search');
   dom.innerHTML = `
+    <button type="button" class="cm-bsearch-icon cm-bsearch-close" name="close" title="Close — Esc">${xIcon}</button>
     <div class="cm-bsearch-row">
       <div class="cm-bsearch-field">
         <span class="cm-bsearch-ic">⌕</span>
@@ -45,7 +46,6 @@ function createForgePanel(view: EditorView): Panel {
         <button type="button" class="cm-bsearch-chip" name="re" title="Regular expression"><i></i>regexp</button>
         <button type="button" class="cm-bsearch-chip" name="word" title="Match whole word"><i></i>by word</button>
       </div>
-      <button type="button" class="cm-bsearch-icon" name="close" title="Close — Esc">${xIcon}</button>
     </div>
     <div class="cm-bsearch-row">
       <div class="cm-bsearch-field">
@@ -176,10 +176,11 @@ const forgeSearchTheme = EditorView.theme({
   '.cm-panels.cm-panels-bottom': { borderTop: 'none' },
 
   '.cm-bsearch': {
+    position: 'relative',
     display: 'flex',
     flexDirection: 'column',
     gap: '9px',
-    padding: '11px 12px',
+    padding: '11px 40px 11px 12px',
     background: 'linear-gradient(180deg, var(--surface-3), var(--surface-2))',
     borderTop: '1px solid rgba(255,154,61,0.35)',
     boxShadow: 'inset 0 1px 0 rgba(255,255,255,0.03)',
@@ -238,6 +239,10 @@ const forgeSearchTheme = EditorView.theme({
   },
   '.cm-bsearch-icon:hover': { color: 'var(--text)', background: 'var(--surface)' },
   '.cm-bsearch-icon svg': { width: '15px', height: '15px' },
+
+  // Pinned out of the flex flow so it never gets pushed onto its own line when
+  // the row above wraps at narrower widths.
+  '.cm-bsearch-close': { position: 'absolute', top: '9px', right: '9px' },
 });
 
 /** Drop-in extension: forge-themed find/replace with a live match counter. */
